@@ -1,0 +1,19 @@
+.root{
+
+}
+
+.btnStartGame {
+    -fx-font-family: 'Press Start 2P', cursive;
+    -fx-font-size: 18px;
+}
+
+.lblTitel {
+    -fx-font-family: 'Press Start 2P', cursive;
+    -fx-font-size: 24px;
+    -fx-text-alignment: right;
+}
+
+.lblPlayernaam{
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
