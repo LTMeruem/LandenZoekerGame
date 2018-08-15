@@ -17,3 +17,13 @@
     -fx-font-size: 14px;
     -fx-font-weight: bold;
 }
+
+.grayControl {
+    -fx-background-color: gray;
+    -fx-alignment: center;
+}
+
+.cornSilkControl {
+    -fx-background-color: #3a801d;
+    -fx-alignment: center;
+}

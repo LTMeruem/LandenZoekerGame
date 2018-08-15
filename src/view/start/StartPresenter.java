@@ -9,17 +9,22 @@ import model.Player;
 import view.start.game.GamePresenter;
 import view.start.game.GameView;
 
+import java.io.File;
+import java.util.ArrayList;
+
 public class StartPresenter {
 
     private Game game;
     private StartView view;
     private StartPopup popup;
+    private ArrayList<String> raster;
 
-    public StartPresenter(Game game, StartView view){
+    public StartPresenter(Game game, StartView view, ArrayList<String> raster) {
         this.view = view;
         this.game = game;
+        this.raster = raster;
         addEventHandlers();
-        updateView();
+
     }
 
     private void addEventHandlers() {
@@ -27,9 +32,8 @@ public class StartPresenter {
             @Override
             public void handle(ActionEvent event) {
                 game.startGame();
-
                 GameView gameView = new GameView();
-                GamePresenter gamePresenter = new GamePresenter(game, gameView);
+                new GamePresenter(game, gameView, raster);
                 view.getScene().setRoot(gameView);
             }
         });
@@ -57,7 +61,6 @@ public class StartPresenter {
                         view.getBtnStartGame().setDisable(false);
                         stage.close();
 
-
                     }
                 });
 
@@ -66,9 +69,5 @@ public class StartPresenter {
         }
 
         );
-    }
-
-    private void updateView(){
-
     }
 }

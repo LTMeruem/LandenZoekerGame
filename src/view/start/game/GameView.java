@@ -1,17 +1,16 @@
 package view.start.game;
 
+import game.GameResolver;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
-import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import model.Grid;
 
-import java.io.File;
+import java.util.ArrayList;
 
 public class GameView extends BorderPane {
 
@@ -21,15 +20,13 @@ public class GameView extends BorderPane {
     private VBox vBox;
     private HBox hBox;
     private BorderPane borderPane;
-    private int cellNumber;
-    private int teller = 0;
-    File file = new File("roosterInhoud/oplossingen.txt");
-
-
+    private ArrayList<Label> clickedLabels;
+    private GameResolver gameResolver;
     public GameView() {
         initialiseNodes();
         layoutNodes();
-
+        this.clickedLabels = new ArrayList<Label>();
+        this.gameResolver = new GameResolver();
     }
 
     public void initialiseNodes() {
@@ -42,7 +39,7 @@ public class GameView extends BorderPane {
     }
 
     public void layoutNodes() {
-        this.setPrefSize(900,600);
+        this.setPrefSize(900, 600);
 
         Menu mnHelp = new Menu("Options");
         mnHelp.getItems().addAll(miAbout, miQuit);
@@ -54,46 +51,64 @@ public class GameView extends BorderPane {
         this.setTop(menuBar);
     }
 
-    public void fillGrid(Grid grid) {
-        /*for (int i = 0; i < grid.getRows(); i++) {
-            for (int j = 0; j < grid.getColumns(); j++) {
-                cellNumber = grid.getCells()[i][j].getCellNumber();
-                lblCell = new Label(String.valueOf(cellNumber));
-                lblCell.setPrefSize(50, 50);
-                lblCell.setStyle("-fx-font-weight: bold");
-                lblCell.setAlignment(Pos.CENTER);
-                gpBoard.add(lblCell, j, i);
-            }
-        }*/
-        gpBoard.addRow(0, new Label("1"), new Label("2"), new Label("3"), new Label("3"), new Label("1"), new Label("2"), new Label("3"), new Label("3"), new Label("1"), new Label("2"), new Label("3"), new Label("3"));
-        gpBoard.addRow(1, new Label("1"), new Label("2"), new Label("3"), new Label("3"), new Label("1"), new Label("2"), new Label("3"), new Label("3"), new Label("1"), new Label("2"), new Label("3"), new Label("3"));
-        gpBoard.addRow(2, new Label("1"), new Label("2"), new Label("3"), new Label("3"), new Label("1"), new Label("2"), new Label("3"), new Label("3"), new Label("1"), new Label("2"), new Label("3"), new Label("3"));
-        gpBoard.addRow(3, new Label("1"), new Label("2"), new Label("3"), new Label("3"), new Label("1"), new Label("2"), new Label("3"), new Label("3"), new Label("1"), new Label("2"), new Label("3"), new Label("3"));
-        gpBoard.addRow(4, new Label("1"), new Label("2"), new Label("3"), new Label("3"), new Label("1"), new Label("2"), new Label("3"), new Label("3"), new Label("1"), new Label("2"), new Label("3"), new Label("3"));
-        gpBoard.addRow(5, new Label("1"), new Label("2"), new Label("3"), new Label("3"), new Label("1"), new Label("2"), new Label("3"), new Label("3"), new Label("1"), new Label("2"), new Label("3"), new Label("3"));
-        gpBoard.addRow(6, new Label("1"), new Label("2"), new Label("3"), new Label("3"), new Label("1"), new Label("2"), new Label("3"), new Label("3"), new Label("1"), new Label("2"), new Label("3"), new Label("3"));
-        gpBoard.addRow(7, new Label("1"), new Label("2"), new Label("3"), new Label("3"), new Label("1"), new Label("2"), new Label("3"), new Label("3"), new Label("1"), new Label("2"), new Label("3"), new Label("3"));
+    public void fillGrid(Grid grid, ArrayList<String> raster) {
 
-        for (Node n: gpBoard.getChildren()) {
-            if (n instanceof Control) {
-                Control control = (Control) n;
-                control.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-                control.setStyle("-fx-background-color: cornsilk; -fx-alignment: center;");
-                control.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        raster.forEach((stringRaster) -> {
+            char[] characters = stringRaster.toCharArray();
+            // create array of labels with char length
+            Label[] labels = new Label[characters.length];
+            for (int i = 0; i < characters.length; i++) {
+                // create a label for each character
+                labels[i] = new Label("" + characters[i]);
+            }
+            gpBoard.addRow(raster.indexOf(stringRaster), labels);
+        });
+
+
+        for (Node n : gpBoard.getChildren()) {
+            if (n instanceof Label) {
+                Label label = (Label) n;
+                label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+                setControlColor(label, "cornsilk");
+                label.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
-                        if (event.getClickCount() == 2 && teller < 17){
+                        if (event.getClickCount() == 2) {
+                            // TODO: moet groen worden als die in de oplossing.txt steekt
 
-                            teller++;
-                        }else if (){
+                            if(!labelExists(label)){
+                                clickedLabels.add(label);
+                            }
+                            final String[] country = {""};
+                            clickedLabels.forEach((label) -> {
+                                country[0] += label.getText();
+                            });
+                            System.out.println(gameResolver.checkCountryIsValid(country[0]));
+                            System.out.println(clickedLabels);
 
-                        }else if (event.getClickCount() == 2 && teller == 17){
-
-                        }else if (){
-
-                        }else {
-                            control.setStyle("-fx-background-color: gray; -fx-alignment: center;");
+                            if(gameResolver.checkCountryIsValid(country[0])){
+                                clickedLabels.forEach((label) -> {
+                                    setControlColor(label, "#3a801d");
+                                });
+                            } else {
+                                clickedLabels.forEach((label) -> {
+                                    setControlColor(label, "cornsilk");
+                                });
+                            }
+                        } else {
+                            if (label.getStyle().contains("cornsilk")) {
+                                if(!labelExists(label)){
+                                    setControlColor(label, "gray");
+                                    clickedLabels.add(label);
+                                }
+                            } else {
+                                if(labelExists(label)){
+                                    setControlColor(label, "cornsilk");
+                                    clickedLabels.remove(label);
+                                }
+                            }
                         }
+
                     }
                 });
             }
@@ -106,23 +121,34 @@ public class GameView extends BorderPane {
 
         gpBoard.setStyle("-fx-background-color: palegreen;  -fx-padding: 5; -fx-hgap: 5; -fx-vgap: 5;");
         gpBoard.setSnapToPixel(false);
-        //gpBoard.setGridLinesVisible(true);
+        // gpBoard.setGridLinesVisible(true);
 
         ColumnConstraints oneThird = new ColumnConstraints();
-        oneThird.setPercentWidth(100/3.0);
+        oneThird.setPercentWidth(100 / 3.0);
         oneThird.setHalignment(HPos.CENTER);
-        gpBoard.getColumnConstraints().addAll(oneThird, oneThird, oneThird, oneThird, oneThird, oneThird, oneThird, oneThird, oneThird, oneThird, oneThird, oneThird);
+        gpBoard.getColumnConstraints().addAll(oneThird, oneThird, oneThird, oneThird, oneThird, oneThird, oneThird,
+                oneThird, oneThird, oneThird, oneThird, oneThird);
 
         RowConstraints oneHalf = new RowConstraints();
-        oneHalf.setPercentHeight(100/2.0);
+        oneHalf.setPercentHeight(100 / 2.0);
         oneHalf.setValignment(VPos.CENTER);
         gpBoard.getRowConstraints().addAll(oneHalf, oneHalf, oneHalf, oneHalf, oneHalf, oneHalf, oneHalf, oneHalf);
 
     }
 
-    public MenuItem getMiAbout(){return miAbout;}
+    private void setControlColor(Control control, String color){
+        control.setStyle("-fx-background-color:" + color +"; -fx-alignment: center;");
+    }
 
-   public GridPane getGpBoard() {
+    public boolean labelExists(Label label){
+        return this.clickedLabels.indexOf(label) > -1;
+    }
+
+    public MenuItem getMiAbout() {
+        return miAbout;
+    }
+
+    public GridPane getGpBoard() {
         return gpBoard;
     }
 

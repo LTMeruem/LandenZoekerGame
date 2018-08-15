@@ -2,15 +2,13 @@ package view.start.game;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.shape.Circle;
 import model.Game;
-import view.start.StartPopup;
 import view.start.StartPresenter;
 import view.start.StartView;
+
+import java.util.ArrayList;
 
 
 public class GamePresenter {
@@ -18,12 +16,12 @@ public class GamePresenter {
     private Game game;
     private GameView view;
 
-    public GamePresenter(Game game, GameView view){
+    public GamePresenter(Game game, GameView view, ArrayList<String> raster){
         this.view = view;
         this.game = game;
         initialisePlayer();
         addEventHandlers();
-        view.fillGrid(game.getGrid());
+        view.fillGrid(game.getGrid(), raster);
     }
 
     private void initialisePlayer(){
@@ -38,21 +36,14 @@ public class GamePresenter {
     }
 
     private void addEventHandlers(){
-
-
-
-
         view.getMiQuit().setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 StartView startView = new StartView();
-                StartPresenter startPresenter = new StartPresenter(game, startView);
+                StartPresenter startPresenter = new StartPresenter(game, startView, new ArrayList<String>());
                 view.getScene().setRoot(startView);
             }
         });
     }
 
-    private void updateView(){
-
-    }
 }
